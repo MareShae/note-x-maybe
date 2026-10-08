@@ -1,0 +1,364 @@
+<!-- Include custom panels with xmlns:local -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:NoteXMaybe.ViewModels"
+             xmlns:local="using:NoteXMaybe.CustomControls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="NoteXMaybe.Views.ScheduleView"
+             x:DataType="vm:ScheduleViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ScheduleViewModel />
+    </Design.DataContext>
+
+    <!-- Schedule View -->
+    <Panel>
+        <!-- Notes Space -->
+        <ScrollViewer Name="CanvasScroller"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto" >
+
+            <Grid Name="CanvasGrid" ColumnDefinitions="Auto,*">
+
+                <!-- Grid Column 0 -->
+
+                <!-- Temporal Label -->
+                <ItemsControl Grid.Column="0" Name="CanvasControlI"  ItemsSource="{Binding Liners}">
+
+                    <!-- Panel is a Canvas -->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <local:PositionPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <!-- Setter for Canvas properties -->
+                    <ItemsControl.ItemContainerTheme>
+                        <ControlTheme TargetType="ContentPresenter">
+                            <Setter Property="local:PositionPanel.Y" Value="{ReflectionBinding Y}" />
+                        </ControlTheme>
+                    </ItemsControl.ItemContainerTheme>
+
+                    <ItemsControl.ItemTemplate>
+                        <!-- Content is produced in a ContentPresenter, Canvas props do not -->
+                        <DataTemplate>
+
+                            <TextBlock Text="{Binding Label}" />
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+
+                <!-- Current Time Indicator: Label -->
+                <local:PositionPanel Grid.Column="0">
+                    <TextBlock Text="{Binding CurretTimeLabel}"
+                        Foreground="Red"
+                        local:PositionPanel.Y="{Binding CurretTimeOverlineY}" />
+                </local:PositionPanel>
+
+
+
+                <!-- Grid Column 1 -->
+
+                <!-- Background Lines -->
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Liners}">
+
+                    <!-- Panel is a Canvas -->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <local:PositionPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <!-- Setter for Canvas properties -->
+                    <ItemsControl.ItemContainerTheme>
+                        <ControlTheme TargetType="ContentPresenter">
+                            <Setter Property="local:PositionPanel.Y" Value="{ReflectionBinding Y}" />
+                        </ControlTheme>
+                    </ItemsControl.ItemContainerTheme>
+
+                    <ItemsControl.ItemTemplate>
+                        <!-- Content is produced in a ContentPresenter, Canvas props do not -->
+                        <DataTemplate>
+
+                            <Rectangle
+                                Height="2"
+                                Width="{Binding Bounds.Width, RelativeSource={RelativeSource AncestorType=local:PositionPanel}}"
+                                Fill="Black"
+                                    />
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+
+                <!-- Content Rectangles -->
+                <ItemsControl  Grid.Column="1" ItemsSource="{Binding ScheduleItems}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <local:PositionPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <!-- Setter for Canvas properties -->
+                    <ItemsControl.ItemContainerTheme>
+                        <ControlTheme TargetType="ContentPresenter">
+                            <Setter Property="local:PositionPanel.X" Value="{ReflectionBinding X}" />
+                            <Setter Property="local:PositionPanel.Y" Value="{ReflectionBinding Y}" />
+                        </ControlTheme>
+                    </ItemsControl.ItemContainerTheme>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+
+                            <!-- Make the entire schedule note clickable -->
+                            <Button Command="{Binding $parent[ItemsControl].DataContext.OnScheduleItemClicked}"
+                             CommandParameter="{Binding Id}"
+                             Background="Transparent"
+                             BorderBrush="Transparent" >
+                                <Panel>
+                                    <!-- The bounding box -->
+                                    <Rectangle
+                                        Width="{Binding W}"
+                                        Height="{Binding H}"
+                                        Stroke="{Binding Stroke}"
+                                        StrokeThickness="2" />
+                                    <!-- The label -->
+                                    <TextBlock Text="{Binding ActivityLabel}"
+                                        Foreground="{Binding TextColour}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top" />
+
+                                    <!-- Buttons -->
+
+                                    <!-- (un)confirm button -->
+                                    <Button Content="Cfrm" 
+                                        Command="{Binding $parent[ItemsControl].DataContext.OnScheduleItemConfirmClicked}"
+                                        CommandParameter="{Binding Id}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top" />
+                                    <!-- delete button -->
+                                    <Button Content="dele" 
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top" />
+                                </Panel>
+                            </Button>
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Current Time Indicator: OverLine -->
+                <local:PositionPanel Grid.Column="1">
+                    <Rectangle 
+                        Height="2"
+                        Width="{Binding Bounds.Width, RelativeSource={RelativeSource AncestorType=local:PositionPanel}}"
+                        Fill="Red"
+                        local:PositionPanel.Y="{Binding CurretTimeOverlineY}" />
+                </local:PositionPanel>
+
+            </Grid>
+
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Orientation="Vertical"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom">
+            <Button Content="-" Command="{Binding ToggleCommandDropScheduleMode}" />
+            <Button Content="+" Click="ShowScheduleInsertOverlay" />
+        </StackPanel>
+
+        
+
+        <!-- 
+            ! {schedule insert overlay}
+            Schedule Insert Overlay
+
+            == multi
+            {{Select time}
+                {repeat every/for} {day/week/month/year}
+                {until (if every)}
+            }{{repeat} ...}
+
+            1. select {time}
+            2. choose to {repeat {every OR for} [day/week/month/year]} 
+            3. a. if {repeat every ...}, {until} becomes available, otherwise it goes on forever
+                b. if {repeat for ...}, {until} is auto-calculated at the end of the period from the start date
+            4. wrap from #2 to build a complex schedule
+
+            basically, it can be wrapped multiple times for specific effects (advanced)
+        -->
+
+        <Panel x:Name="ScheduleInsertOverlay"
+            IsVisible="False"
+            Background="rgb(255, 255, 255)" >
+
+            <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#00000000" >
+
+                <!-- 
+                    ! [status space]
+                    ! shows the status of the DB Insert operation
+                -->
+                <TextBlock x:Name="ScheduleInsertStatus"
+                    Text="{Binding ScheduleInsertStatusDetail}"
+                    Foreground="rgb(255, 0, 0)"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+
+                <!-- 
+                    ! [activity select space]
+                    ! select from a list of Activities in the ComboBox
+                -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Activity"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <!-- List of Activities -->
+                    <ComboBox ItemsSource="{Binding InsertActivityItems}"
+                        SelectedItem="{Binding SelectedActivityItem}" >
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 
+                    ! [start time]
+                    ! input for Time{Hr:Mn} that the Activity starts
+                -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Start"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <!-- Start Hr -->
+                    <TextBox Text="{Binding InsertStartTimeHr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        TextWrapping="Wrap" />
+                    <!--  -->
+                    <TextBlock Text=":" />
+                    <!-- Start Mn -->
+                    <TextBox Text="{Binding InsertStartTimeMn}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- 
+                    ! [period space]
+                    ! input for the length of the Activity
+                -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Duration" />
+                    <!-- Activity length -->
+                    <TextBox Text="{Binding InsertPeriodText}"
+                        TextWrapping="Wrap" />
+                    <!-- Length time-scale -->
+                    <ComboBox ItemsSource="{Binding InsertPeriodTimeScale}"
+                        SelectedItem="{Binding SelectedPeriodTimeScale}" >
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 
+                    ! [repeat space]
+                    ! defines how the Activity repeats
+
+                    select [specific date]
+                    select [# day repetition] , which ends with the week
+                    select [# week repetition] , which ends with the month
+                    select [# month repetition] , which ends with the year
+                    select [# year repetition]
+                    
+                -->
+
+                <!-- specific date -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Start Date"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <!-- Year -->
+                    <TextBox Text="{Binding InsertStartYear}"
+                        PlaceholderText="YYYY"
+                        TextWrapping="Wrap" />
+                    <!--  -->
+                    <TextBlock Text="-" />
+                    <!-- Month -->
+                    <TextBox Text="{Binding InsertStartMonth}"
+                        PlaceholderText="MM"
+                        TextWrapping="Wrap" />
+                    <!--  -->
+                    <TextBlock Text="-" />
+                    <!-- Day -->
+                    <TextBox Text="{Binding InsertStartDay}"
+                        PlaceholderText="DD"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- day rep -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Day Repetition" />
+                    <!--  -->
+                    <TextBox Text="{Binding InsertDayRepetition}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- week rep -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Week Repetition" />
+                    <!--  -->
+                    <TextBox Text="{Binding InsertWeekRepetition}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+                <!-- month rep -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Month Repetition" />
+                    <!--  -->
+                    <TextBox Text="{Binding InsertMonthRepetition}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+                <!-- year rep -->
+                <StackPanel Orientation="Horizontal">
+                    <!-- Label -->
+                    <TextBlock Text="Year Repetition"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <!--  -->
+                    <TextBox Text="{Binding InsertYearRepetition}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Button Space -->
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Save" Command="{Binding CommandScheduleInsert}" />
+                    <Button Content="Close" Click="CloseScheduleInsertOverlay" />
+                </StackPanel>
+
+            </StackPanel>
+
+        </Panel>
+
+    </Panel>
+    
+
+    <!-- <TextBox Text="{Binding Greeting}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center" /> -->
+</UserControl>

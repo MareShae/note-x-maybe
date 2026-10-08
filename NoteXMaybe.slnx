@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Project Path="NoteXMaybe.Android/NoteXMaybe.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="NoteXMaybe.Browser/NoteXMaybe.Browser.csproj" />
+  <Project Path="NoteXMaybe.Desktop/NoteXMaybe.Desktop.csproj" />
+  <Project Path="NoteXMaybe.iOS/NoteXMaybe.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="NoteXMaybe/NoteXMaybe.csproj" />
+</Solution>

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!--If you are willing to use platform-specific APIs, use conditional compilation.
+    See https://docs.avaloniaui.net/docs/guides/platforms/platform-specific-code/dotnet for more details.-->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <!-- custom platform identifier -->
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);DESKTOP</DefineConstants>
+
+    <DefineConstants Condition="$(RuntimeIdentifier.StartsWith('linux'))">$(DefineConstants);LINUX</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Linux')) == 'true'">$(DefineConstants);LINUX</DefineConstants>
+
+    <DefineConstants Condition="$(RuntimeIdentifier.StartsWith('win'))">$(DefineConstants);WINDOWS</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true'">$(DefineConstants);WINDOWS</DefineConstants>
+
+    <DefineConstants Condition="$(RuntimeIdentifier.StartsWith('osx'))">$(DefineConstants);MACOS</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('OSX')) == 'true'">$(DefineConstants);MACOS</DefineConstants>
+  </PropertyGroup>
+  <!--  -->
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- introduce AdditionalProperties to pass the Constants to the shared project where it is needed -->
+    <ProjectReference Include="..\NoteXMaybe\NoteXMaybe.csproj"
+      AdditionalProperties="DefineConstants=$(DefineConstants)" />
+  </ItemGroup>
+</Project>

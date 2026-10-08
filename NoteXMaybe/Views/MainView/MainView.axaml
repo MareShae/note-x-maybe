@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:NoteXMaybe.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="NoteXMaybe.Views.MainView"
+             x:DataType="vm:MainViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+    
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <Panel Grid.Row="0" VerticalAlignment="Top">
+            <Button Content="Back"
+                IsVisible="{Binding BackButtonVisible}"
+                HorizontalAlignment="Left"
+                Command="{Binding CommandNavigateBackPage}"
+                 />
+
+            <TextBlock Text="{Binding NavigationPageTitle}"
+                HorizontalAlignment="Center"
+                 />
+
+            <Button Content="Fore"
+                IsVisible="{Binding ForeButtonVisible}"
+                HorizontalAlignment="Right"
+                Command="{Binding CommandNavigateForePage}"
+                 />
+        </Panel>
+
+        <ContentControl Grid.Row="1" Content="{Binding CurrentPage}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Content="Programme" Command="{Binding CommandRequestProgrammeVM}"  />
+            <Button Content="Schedule" Command="{Binding CommandRequestScheduleVM}" />
+        </StackPanel>
+
+    </Grid>
+
+    <!-- <TextBox Text="{Binding Greeting}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center" /> -->
+</UserControl>

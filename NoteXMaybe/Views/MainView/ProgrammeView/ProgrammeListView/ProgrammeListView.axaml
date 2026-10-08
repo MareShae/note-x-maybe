@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:NoteXMaybe.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="NoteXMaybe.Views.ProgrammeListView"
+             x:DataType="vm:ProgrammeListViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ProgrammeListViewModel />
+    </Design.DataContext>
+
+    <!-- List View -->
+
+    <Panel>
+        <TextBox Text="{Binding Tip}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center" />
+
+        <ListBox
+            ItemsSource="{Binding ProgrammeItems}"
+            SelectedItem="{Binding SelectedProgrammeItem}" >
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="5,5" />
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        CornerRadius="2"
+                        BorderThickness="2"
+                        BorderBrush="Black"
+                        Padding="5" >
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Label}" />
+                            <TextBlock Text="{Binding Notes}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Orientation="Vertical"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom">
+            <Button Content="-"
+                Command="{Binding ToggleCommandDropProgrammeMode}" />
+            <Button Content="+" 
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Click="ToggleProgrammeInsertOverlay" />
+        </StackPanel>
+
+        <!-- Programme Insert Overlay -->
+
+        <Panel x:Name="ProgrammeInsertOverlay"
+            IsVisible="False"
+            Background="rgb(255, 255, 255)" >
+
+            <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#00000000" >
+
+                <!-- Status Space -->
+                <TextBlock x:Name="InsertProgrammeStatus"
+                    Text="{Binding InsertProgrammeStatusDetail}"
+                    Foreground="rgb(255, 0, 0)"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+
+                <!-- Label Space -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Label"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <TextBox Text="{Binding LabelText}"
+                        PlaceholderText="Title of the programme"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Notes Space -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Notes"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <TextBox Text="{Binding NotesText}"
+                        PlaceholderText="Describe the programme"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Save" Command="{Binding CommandSaveNewProgramme}" />
+                    <Button Content="Close" Click="CloseProgrammeInsertOverlay" />
+                </StackPanel>
+
+            </StackPanel>
+
+        </Panel>
+
+    </Panel>
+</UserControl>
